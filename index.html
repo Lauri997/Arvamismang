@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arvamismäng</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #e8efff;
+            text-align: center;
+            padding: 40px 15px;
+        }
+
+        .game {
+            background: white;
+            max-width: 450px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #0002;
+        }
+
+        h1 {
+            color: #3155a6;
+        }
+
+        input {
+            padding: 12px;
+            width: 100px;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #3155a6;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #203d80;
+        }
+
+        #message {
+            font-weight: bold;
+            margin: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="game">
+    <h1>🎯 Arvamismäng</h1>
+
+    <p>Arva ära salajane arv vahemikus 1–100!</p>
+
+    <input type="number" id="guess" min="1" max="100"
+        placeholder="Sinu arv">
+
+    <button onclick="checkGuess()">Arva!</button>
+
+    <p id="message">Ootan sinu pakkumist!</p>
+
+    <p>Katsete arv: <span id="attempts">0</span></p>
+    <p>Punktid: <span id="score">0</span></p>
+    <p>Parim tulemus: <span id="best">0</span></p>
+
+    <button onclick="newGame()">Alusta uut mängu</button>
+</div>
+
+<script>
+    let secretNumber = Math.floor(Math.random() * 100) + 1;
+    let attempts = 0;
+    let score = 0;
+    let roundPoints = 0;
+    let finished = false;
+
+    let best = Number(localStorage.getItem("bestScore")) || 0;
+    document.getElementById("best").textContent = best;
+
+    function checkGuess() {
+        if (finished) return;
+
+        let guess = Number(document.getElementById("guess").value);
+
+        if (guess < 1 || guess > 100 || !Number.isInteger(guess)) {
+            document.getElementById("message").textContent =
+                "Sisesta täisarv vahemikus 1–100!";
+            return;
+        }
+
+        attempts++;
+        document.getElementById("attempts").textContent = attempts;
+
+        if (guess === secretNumber) {
+            roundPoints = Math.max(100 - (attempts - 1) * 10, 10);
+            score += roundPoints;
+
+            document.getElementById("message").textContent =
+                "🎉 Õige vastus! Said " + roundPoints + " punkti!";
+
+            document.getElementById("score").textContent = score;
+
+            if (score > best) {
+                best = score;
+                localStorage.setItem("bestScore", best);
+                document.getElementById("best").textContent = best;
+            }
+
+            finished = true;
+
+        } else if (guess < secretNumber) {
+            document.getElementById("message").textContent =
+                "Liiga väike! Proovi suuremat arvu.";
+
+        } else {
+            document.getElementById("message").textContent =
+                "Liiga suur! Proovi väiksemat arvu.";
+        }
+    }
+
+    function newGame() {
+        secretNumber = Math.floor(Math.random() * 100) + 1;
+        attempts = 0;
+        roundPoints = 0;
+        finished = false;
+
+        document.getElementById("attempts").textContent = 0;
+        document.getElementById("guess").value = "";
+        document.getElementById("message").textContent =
+            "Uus mäng! Arva ära salajane arv.";
+    }
+</script>
+
+</body>
+</html>
